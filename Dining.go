@@ -1,3 +1,12 @@
+/*Explanation for why this system should avoid deadlocks
+Firstly having a channel for each direction of communication per goroutine avoids
+sends and recieves blocking each other.
+Secondly reading from channels into variables lets us avoid situations where a single channel blocks the rest.
+Lastly the philosopher method contains a randomized float which the philosphers deciesions are based upon.
+This lets philosphers "choose" what to do somewhat randomly every iteration of the loop
+
+*/
+
 package main
 
 import (
@@ -6,7 +15,7 @@ import (
 	"time"
 )
 
-const eatThreshold = 0.80
+const eatThreshold = 0.60
 
 func main() {
 
@@ -70,7 +79,7 @@ func philosopher(name string, checkChan chan int, leftFork []chan string, rightF
 
 			think(name)
 		} else {
-			fmt.Println(name + " attempting to eat")
+			fmt.Println(name, " attempting to eat")
 			leftFork[0] <- "pick up"
 			rightFork[0] <- "pick up"
 			time.Sleep(10)
@@ -84,6 +93,7 @@ func philosopher(name string, checkChan chan int, leftFork []chan string, rightF
 				rightFork[0] <- "finished"
 				eat(name)
 			} else {
+				fmt.Println(name, " got no fork so sad")
 				leftFork[0] <- "finished"
 				rightFork[0] <- "finished"
 			}
