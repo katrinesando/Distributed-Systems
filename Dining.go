@@ -19,7 +19,6 @@ const eatThreshold = 0.60
 
 func main() {
 
-	checkChannels := []chan int{make(chan int), make(chan int), make(chan int), make(chan int), make(chan int)}
 	fork1 := []chan string{make(chan string), make(chan string)}
 	fork2 := []chan string{make(chan string), make(chan string)}
 	fork3 := []chan string{make(chan string), make(chan string)}
@@ -32,26 +31,15 @@ func main() {
 	go forkFunc(fork4)
 	go forkFunc(fork5)
 
-	go philosopher("Socrates", checkChannels[0], fork1, fork2)
-	go philosopher("Nietzche", checkChannels[1], fork2, fork3)
-	go philosopher("Sartre", checkChannels[2], fork3, fork4)
-	go philosopher("Plato", checkChannels[3], fork4, fork5)
-	go philosopher("de Beauvoir", checkChannels[4], fork5, fork1)
+	go philosopher("Socrates", fork1, fork2)
+	go philosopher("Nietzche", fork2, fork3)
+	go philosopher("Sartre", fork3, fork4)
+	go philosopher("Plato", fork4, fork5)
+	go philosopher("de Beauvoir", fork5, fork1)
 
-	allDoneEating := false
-	for !allDoneEating {
-		allDoneEating = true
+	for {
 
-		phil1EatenEnough := <-checkChannels[0] >= 3
-		phil2EatenEnough := <-checkChannels[1] >= 3
-		phil3EatenEnough := <-checkChannels[2] >= 3
-		phil4EatenEnough := <-checkChannels[3] >= 3
-		phil5EatenEnough := <-checkChannels[4] >= 3
-		if !phil1EatenEnough || !phil2EatenEnough || !phil3EatenEnough || !phil4EatenEnough || !phil5EatenEnough {
-			allDoneEating = false
-		}
 	}
-	fmt.Print("------------------Everyone ate enough, the dinner is over-------------------")
 
 }
 
@@ -70,12 +58,11 @@ func forkFunc(channels []chan string) {
 	}
 }
 
-func philosopher(name string, checkChan chan int, leftFork []chan string, rightFork []chan string) {
+func philosopher(name string, leftFork []chan string, rightFork []chan string) {
 	var timesEaten int
 	for true {
 		flip := rand.Float32()
 		if flip < eatThreshold {
-			checkChan <- timesEaten
 
 			think(name)
 		} else {
@@ -88,7 +75,6 @@ func philosopher(name string, checkChan chan int, leftFork []chan string, rightF
 			if gotLeftFork && gotRightFork {
 
 				timesEaten++
-				checkChan <- timesEaten
 				leftFork[0] <- "finished"
 				rightFork[0] <- "finished"
 				eat(name)
