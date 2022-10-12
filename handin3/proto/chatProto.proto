@@ -5,11 +5,14 @@ option go_package = "./proto";
 
 
 service getCurrentTime {
-    rpc getTime (GetTimeRequest) returns (GetTimeReply) {}
+    rpc serverBroadcastMessage (stream Broadcast) returns (AcK);
+}
+message Ack {
+    int64 val = 1;
 }
 
-message GetTimeRequest {}
-
-message GetTimeReply {
-    string reply = 1;
+message Broadcast {
+    string message = 1;
+    Vector clock = 2;
 }
+
