@@ -1,16 +1,17 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
-
-	t "time"
-
-	pb "github.com/katrinesando/Distributed-Systems/tree/ChittyChat_Handin3/proto"
 
 	"google.golang.org/grpc"
 )
+
+type Vector struct {
+	clock []int
+}
+
+var id int
+var clock Vector
 
 func main() {
 	// Creat a virtual RPC Client Connection on port  9080 WithInsecure (because  of http)
@@ -23,23 +24,13 @@ func main() {
 	// Defer means: When this function returns, call this method (meaing, one main is done, close connection)
 	defer conn.Close()
 
-	//  Create new Client from generated gRPC code from proto
-	c := pb.NewGetCurrentTimeClient(conn)
-
-	for {
-		SendGetTimeRequest(c)
-		t.Sleep(5 * t.Second)
-	}
 }
 
-func SendGetTimeRequest(c pb.GetCurrentTimeClient) {
-	// Between the curly brackets are nothing, because the .proto file expects no input.
-	message := pb.GetTimeRequest{}
+func UpdateClock(recievedClock Vector) {
+	sameLen := len(clock.clock) == len(recievedClock.clock)
+	if sameLen {
+		for i := 0; i < len(recievedClock.clock); i++ {
 
-	response, err := c.GetTime(context.Background(), &message)
-	if err != nil {
-		log.Fatalf("Error when calling GetTime: %s", err)
+		}
 	}
-
-	fmt.Printf("Current time right now: %s\n", response.Reply)
 }

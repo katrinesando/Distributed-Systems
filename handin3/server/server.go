@@ -16,6 +16,10 @@ type Server struct {
 	pb.UnimplementedGetCurrentTimeServer
 }
 
+type Vector struct {
+	clock []int
+}
+
 func (s *Server) GetTime(ctx context.Context, in *pb.GetTimeRequest) (*pb.GetTimeReply, error) {
 	fmt.Printf("Received GetTime request\n")
 	return &pb.GetTimeReply{Reply: t.Now().String()}, nil
