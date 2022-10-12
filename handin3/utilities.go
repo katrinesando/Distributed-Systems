@@ -12,13 +12,13 @@ func Max(a int, b int) int {
 	}
 }
 
-func UpdateClock(personalClock Vector, recievedClock Vector) Vector {
+func AdjustToOtherClock(personalClock Vector, otherClock Vector) Vector {
 	ownLen := len(personalClock.clock)
-	otherLen := len(recievedClock.clock)
+	otherLen := len(otherClock.clock)
 	sameLen := ownLen == otherLen
 	if sameLen {
 		for i := 0; i < otherLen; i++ {
-			personalClock.clock[i] = Max(personalClock.clock[i], recievedClock.clock[i])
+			personalClock.clock[i] = Max(personalClock.clock[i], otherClock.clock[i])
 		}
 	} else {
 		dif := otherLen - ownLen
@@ -27,7 +27,7 @@ func UpdateClock(personalClock Vector, recievedClock Vector) Vector {
 			personalClock.clock = append(personalClock.clock, 0)
 		}
 		for i := 0; i < otherLen; i++ {
-			personalClock.clock[i] = Max(personalClock.clock[i], recievedClock.clock[i])
+			personalClock.clock[i] = Max(personalClock.clock[i], otherClock.clock[i])
 		}
 	}
 	return personalClock
