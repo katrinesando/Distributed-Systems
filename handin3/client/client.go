@@ -29,8 +29,6 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 		log.Fatalf("couldnt connect to client: %v", err)
 	}
 
-	// fmt.Printf("Joined channel")
-
 	waitc := make(chan struct{}) //wait for something to finish, requires almost no memory
 
 	go func() {
