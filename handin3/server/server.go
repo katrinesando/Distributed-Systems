@@ -14,6 +14,7 @@ import (
 )
 
 var clock h.Vector
+var id int64
 
 type server struct {
 	chatpb.UnimplementedChatServiceServer
@@ -25,15 +26,18 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 	msgChannel := make(chan *chatpb.Message)
 	s.channel[ch.Name] = append(s.channel[ch.Name], msgChannel)
 	log.Printf("--------- %v joined Chat ----------\n", ch.SendersName)
-
+	id++
 	msg := chatpb.Message{
 		Channel: &chatpb.Channel{
 			Name:        ch.Name,
 			SendersName: ch.SendersName},
 		Message: "1111",
 		Sender:  ch.SendersName,
+		Clock: []*chatpb.TimeStamp{{
+			Stamp: 1,
+		}},
+		Id: id,
 	}
-
 	go func() {
 		streams := s.channel[msg.Channel.Name]
 		for _, msgChan := range streams {
@@ -59,6 +63,10 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 					SendersName: ch.SendersName},
 				Message: "4040",
 				Sender:  ch.SendersName,
+				Clock: []*chatpb.TimeStamp{{
+					Stamp: 1,
+				}},
+				Id: id,
 			}
 
 			go func() {
@@ -111,6 +119,7 @@ func newServer() *server {
 }
 
 func main() {
+	id = 0
 	fmt.Println("--- SERVER APP ---")
 	lis, err := net.Listen("tcp", "localhost:9100")
 	if err != nil {
