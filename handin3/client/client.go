@@ -18,7 +18,7 @@ import (
 var channelName = flag.String("channel", "default", "Channel name for chatting")
 var senderName = flag.String("sender", "default", "Senders name")
 var tcpServer = flag.String("server", ":9100", "Tcp server")
-var id int
+var id int64
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 
@@ -42,15 +42,15 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 				return
 			}
 
-			if *senderName != in.Sender {
-				mes := fmt.Sprintf("%v", in.Message)
-				if mes == "4040" {
-					fmt.Printf("--- %v Left the chat ---\n", in.Sender)
-				} else if mes == "1111" {
-					fmt.Printf("--- %v Joined the Chat ---\n", in.Sender)
-				} else {
-					fmt.Printf("(%v) : %v \n", in.Sender, in.Message)
-				}
+			mes := fmt.Sprintf("%v", in.Message)
+			if mes == "4040" {
+				fmt.Printf("--- %v Left the chat ---\n", in.Sender)
+			} else if mes == "1111" {
+				fmt.Printf("--- %v Joined the Chat ---\n", in.Sender)
+				id = in.Id
+			}
+			if *senderName != in.Sender && mes != "4040" && mes != "1111" {
+				fmt.Printf("(%v --ID: %v) : %v \n", in.Sender, in.Id, in.Message)
 			}
 		}
 	}()
@@ -69,6 +69,11 @@ func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message s
 			SendersName: *senderName},
 		Message: message,
 		Sender:  *senderName,
+		Clock: []*chatpb.TimeStamp{{
+			Stamp: 1,
+		},
+		},
+		Id: id,
 	}
 	stream.Send(&msg)
 
