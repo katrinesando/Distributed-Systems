@@ -12,7 +12,6 @@ service ChatService {
 message Channel {
     string name = 1;
     string senders_name = 2;
-    int64 id = 3;
 }
 
 message Message {
@@ -20,6 +19,7 @@ message Message {
     Channel channel = 2;
     string message = 3;
     repeated TimeStamp clock = 4;
+    int64 id = 5;
 }
 
 message MessageAck {
