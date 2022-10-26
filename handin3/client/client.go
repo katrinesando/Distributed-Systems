@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"sync"
 
 	chatpb "handin3/chatpb"
 
@@ -20,9 +19,10 @@ var channelName = flag.String("channel", "default", "Channel name for chatting")
 var senderName = flag.String("sender", "default", "Senders name")
 var tcpServer = flag.String("server", ":9100", "Tcp server")
 var id int
-var lock sync.Mutex
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
+
+	IncrementClock()
 
 	channel := chatpb.Channel{Name: *channelName, SendersName: *senderName}
 
@@ -60,7 +60,7 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 }
 
 func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message string) {
-
+	IncrementClock()
 	stream, err := client.SendMessage(ctx)
 	if err != nil {
 		log.Printf("Cannot send message: error: %v", err)
