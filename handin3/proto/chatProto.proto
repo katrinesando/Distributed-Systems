@@ -2,10 +2,12 @@ syntax = "proto3";
 
 package proto;
 option go_package = "./proto";
+import "google.protobuf.Struct.proto";
+
 
 
 service getCurrentTime {
-    rpc serverBroadcastMessage (stream Broadcast) returns (AcK);
+    rpc serverBroadcastMessage (stream Broadcast) returns (Ack);
 }
 message Ack {
     int64 val = 1;
@@ -15,4 +17,7 @@ message Broadcast {
     string message = 1;
     Vector clock = 2;
 }
+
+
+
 
