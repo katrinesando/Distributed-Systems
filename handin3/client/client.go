@@ -85,6 +85,8 @@ var clock h.Vector
 
 func main() {
 
+	clock.Clock = make([]int, 0, 2)
+
 	flag.Parse()
 
 	fmt.Println("┌─────────────────────────────┐")
@@ -121,5 +123,10 @@ func UpdateClock(recievedClock h.Vector) {
 }
 
 func IncrementClock() {
+	correctLen := id >= len(clock.Clock)
+	for correctLen {
+		clock.Clock = append(clock.Clock, 0)
+		correctLen = id >= len(clock.Clock)
+	}
 	clock.Clock[id]++
 }
