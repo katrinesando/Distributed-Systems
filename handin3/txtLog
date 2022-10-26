@@ -1,0 +1,16 @@
+2022/10/26 15:46:26 server.go:29: --------- %v joined Chat ----------
+ user2
+2022/10/26 15:46:26 server.go:81: Sent mes: sender:"user2"  channel:{name:"default"  senders_name:"user2"  clock:0}  message:"1111"  id:1
+2022/10/26 15:46:41 server.go:52: --------- user2 Left Chat-------
+2022/10/26 15:56:53 server.go:29: --------- user2 joined Chat ----------
+2022/10/26 15:56:53 server.go:79: Sent mes: sender:"user2"  channel:{name:"default"  senders_name:"user2"  clock:0}  message:"1111"  id:1
+2022/10/26 15:57:03 server.go:29: --------- User1 joined Chat ----------
+2022/10/26 15:57:03 server.go:79: Sent mes: sender:"User1"  channel:{name:"default"  senders_name:"User1"  clock:1}  message:"1111"  id:2
+2022/10/26 15:57:03 server.go:79: Sent mes: sender:"User1"  channel:{name:"default"  senders_name:"User1"  clock:1}  message:"1111"  id:2
+2022/10/26 15:58:17 server.go:29: --------- user2 joined Chat ----------
+2022/10/26 15:58:17 server.go:79: Sent mes: sender:"user2"  channel:{name:"default"  senders_name:"user2"  clock:0}  message:"1111"  id:1
+2022/10/26 15:58:19 server.go:29: --------- User1 joined Chat ----------
+2022/10/26 15:58:19 server.go:79: Sent mes: sender:"User1"  channel:{name:"default"  senders_name:"User1"  clock:1}  message:"1111"  id:2
+2022/10/26 15:58:19 server.go:79: Sent mes: sender:"User1"  channel:{name:"default"  senders_name:"User1"  clock:1}  message:"1111"  id:2
+2022/10/26 16:40:38 server.go:52: --------- User1 Left Chat-------
+2022/10/26 16:40:38 server.go:79: Sent mes: sender:"User1"  channel:{name:"default"  senders_name:"User1"  clock:4}  message:"4040"

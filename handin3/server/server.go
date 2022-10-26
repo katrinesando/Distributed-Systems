@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"sync"
 
 	chatpb "handin3/chatpb"
@@ -64,8 +65,6 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 					Clock:       clock.Clock},
 				Message: "4040",
 				Sender:  ch.SendersName,
-
-				Id: id,
 			}
 
 			go func() {
@@ -129,6 +128,16 @@ func newServer() *server {
 }
 
 func main() {
+	//log to different txt Log file
+	LOG_FILE := "./txtLog"
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+	log.SetFlags(log.Lshortfile | log.LstdFlags)
+
 	id = 0
 	clock.Clock = make([]int32, 1, 1)
 	fmt.Println("--- SERVER APP ---")
