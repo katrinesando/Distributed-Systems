@@ -58,7 +58,7 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 }
 
 func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message string) {
-
+	IncrementClock()
 	stream, err := client.SendMessage(ctx)
 	if err != nil {
 		log.Printf("Cannot send message: error: %v", err)
@@ -115,6 +115,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		go sendMessage(ctx, client, scanner.Text())
+
 	}
 
 }
