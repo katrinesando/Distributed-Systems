@@ -18,11 +18,13 @@ import (
 var channelName = flag.String("channel", "default", "Channel name for chatting")
 var senderName = flag.String("sender", "default", "Senders name")
 var tcpServer = flag.String("server", ":9100", "Tcp server")
-var id int64
+var id int32
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 
-	channel := chatpb.Channel{Name: *channelName, SendersName: *senderName}
+	IncrementClock()
+
+	channel := chatpb.Channel{Name: *channelName, SendersName: *senderName, Clock: clock.Clock}
 
 	stream, err := client.JoinChannel(ctx, &channel)
 	if err != nil {
@@ -48,10 +50,14 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 			} else if mes == "1111" {
 				fmt.Printf("--- %v Joined the Chat ---\n", in.Sender)
 				id = in.Id
-			}
-			if *senderName != in.Sender && mes != "4040" && mes != "1111" {
+			} else if *senderName != in.Sender {
 				fmt.Printf("(%v --ID: %v) : %v \n", in.Sender, in.Id, in.Message)
 			}
+			recClock := h.Vector{
+				Clock: in.Channel.Clock,
+			}
+
+			UpdateClock(recClock)
 		}
 	}()
 	<-waitc
@@ -66,13 +72,11 @@ func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message s
 	msg := chatpb.Message{
 		Channel: &chatpb.Channel{
 			Name:        *channelName,
-			SendersName: *senderName},
+			SendersName: *senderName,
+			Clock:       clock.Clock},
 		Message: message,
 		Sender:  *senderName,
-		Clock: []*chatpb.TimeStamp{{
-			Stamp: 1,
-		},
-		},
+
 		Id: id,
 	}
 	stream.Send(&msg)
@@ -90,7 +94,7 @@ var clock h.Vector
 
 func main() {
 
-	clock.Clock = make([]int, 0, 2)
+	clock.Clock = make([]int32, 1, 1)
 
 	flag.Parse()
 
@@ -128,10 +132,10 @@ func UpdateClock(recievedClock h.Vector) {
 }
 
 func IncrementClock() {
-	correctLen := id >= len(clock.Clock)
+	correctLen := id >= int32(len(clock.Clock))
 	for correctLen {
 		clock.Clock = append(clock.Clock, 0)
-		correctLen = id >= len(clock.Clock)
+		correctLen = id >= int32(len(clock.Clock))
 	}
 	clock.Clock[id]++
 }

@@ -14,7 +14,7 @@ import (
 )
 
 var clock h.Vector
-var id int64
+var id int32
 
 type server struct {
 	chatpb.UnimplementedChatServiceServer
@@ -27,21 +27,19 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 	s.channel[ch.Name] = append(s.channel[ch.Name], msgChannel)
 	log.Printf("--------- %v joined Chat ----------\n", ch.SendersName)
 	id++
-	msg := chatpb.Message{
+	broadcastMsg := chatpb.Message{
 		Channel: &chatpb.Channel{
 			Name:        ch.Name,
-			SendersName: ch.SendersName},
+			SendersName: ch.SendersName,
+			Clock:       clock.Clock},
 		Message: "1111",
 		Sender:  ch.SendersName,
-		Clock: []*chatpb.TimeStamp{{
-			Stamp: 1,
-		}},
-		Id: id,
+		Id:      id,
 	}
 	go func() {
-		streams := s.channel[msg.Channel.Name]
+		streams := s.channel[broadcastMsg.Channel.Name]
 		for _, msgChan := range streams {
-			msgChan <- &msg
+			msgChan <- &broadcastMsg
 		}
 	}()
 
@@ -57,15 +55,16 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 					break
 				}
 			}
+
+			clock.Clock[0]++
 			msg := chatpb.Message{
 				Channel: &chatpb.Channel{
 					Name:        ch.Name,
-					SendersName: ch.SendersName},
+					SendersName: ch.SendersName,
+					Clock:       clock.Clock},
 				Message: "4040",
 				Sender:  ch.SendersName,
-				Clock: []*chatpb.TimeStamp{{
-					Stamp: 1,
-				}},
+
 				Id: id,
 			}
 
@@ -79,10 +78,16 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 			return nil
 		case msg := <-msgChannel:
 			log.Printf("Sent mes: %v", msg)
+			recClock := h.Vector{
+				Clock: msg.Channel.Clock,
+			}
+
+			UpdateClock(recClock)
 
 			go msgStream.Send(msg)
 
 		}
+
 	}
 }
 
@@ -96,6 +101,12 @@ func (s *server) SendMessage(msgStream chatpb.ChatService_SendMessageServer) err
 	if err != nil {
 		return err
 	}
+
+	recClock := h.Vector{
+		Clock: msg.Channel.Clock,
+	}
+
+	UpdateClock(recClock)
 
 	ack := chatpb.MessageAck{Status: "SENT"}
 	msgStream.SendAndClose(&ack) //sends back it is acknowledged - only used for log right now
@@ -119,7 +130,7 @@ func newServer() *server {
 
 func main() {
 	id = 0
-	clock.Clock = make([]int, 0, 2)
+	clock.Clock = make([]int32, 1, 1)
 	fmt.Println("--- SERVER APP ---")
 	lis, err := net.Listen("tcp", "localhost:9100")
 	if err != nil {
@@ -134,9 +145,5 @@ func main() {
 
 func UpdateClock(recievedClock h.Vector) {
 	clock = h.AdjustToOtherClock(clock, recievedClock)
-	IncrementClock()
-}
-
-func IncrementClock() {
 	clock.Clock[0]++
 }

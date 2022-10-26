@@ -1,10 +1,10 @@
 package handin3
 
 type Vector struct {
-	Clock []int
+	Clock []int32
 }
 
-func Max(a int, b int) int {
+func Max(a int32, b int32) int32 {
 	if a < b {
 		return b
 	} else {
