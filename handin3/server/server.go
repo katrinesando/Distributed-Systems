@@ -82,7 +82,6 @@ func (s *server) SendMessage(msgStream chatpb.ChatService_SendMessageServer) err
 	msg, err := msgStream.Recv() //receive message
 
 	if err == io.EOF {
-		fmt.Printf("done?")
 		return nil
 	}
 
@@ -111,6 +110,7 @@ func newServer() *server {
 }
 
 func main() {
+	clock.Clock = make([]int, 0, 2)
 	fmt.Println("--- SERVER APP ---")
 	lis, err := net.Listen("tcp", "localhost:9100")
 	if err != nil {
@@ -121,4 +121,13 @@ func main() {
 	grpcServer := grpc.NewServer(opts...)
 	chatpb.RegisterChatServiceServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
+}
+
+func UpdateClock(recievedClock h.Vector) {
+	clock = h.AdjustToOtherClock(clock, recievedClock)
+	IncrementClock()
+}
+
+func IncrementClock() {
+	clock.Clock[0]++
 }

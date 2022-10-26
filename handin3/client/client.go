@@ -22,8 +22,6 @@ var id int
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 
-	IncrementClock()
-
 	channel := chatpb.Channel{Name: *channelName, SendersName: *senderName}
 
 	stream, err := client.JoinChannel(ctx, &channel)
