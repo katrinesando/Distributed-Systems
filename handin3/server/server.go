@@ -26,7 +26,7 @@ type server struct {
 func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_JoinChannelServer) error {
 	msgChannel := make(chan *chatpb.Message)
 	s.channel[ch.Name] = append(s.channel[ch.Name], msgChannel)
-	log.Printf("--------- %v joined Chat ----------\n", ch.SendersName)
+	log.Printf("--------- %v joined Chat ----------\n", ch.SendersName, ch.Clock)
 	id++
 	broadcastMsg := chatpb.Message{
 		Channel: &chatpb.Channel{
@@ -49,7 +49,7 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 		select {
 		case <-msgStream.Context().Done():
 
-			log.Printf("--------- %v Left Chat-------", ch.SendersName)
+			log.Printf("--------- %v Left Chat-------", ch.SendersName, ch.Clock)
 			for i, element := range s.channel[ch.Name] {
 				if element == msgChannel {
 					s.channel[ch.Name] = append(s.channel[ch.Name][:i], s.channel[ch.Name][i+1:]...)
