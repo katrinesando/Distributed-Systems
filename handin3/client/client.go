@@ -10,14 +10,15 @@ import (
 	"log"
 	"os"
 
+	chatpb "handin3/chatpb"
+
 	"google.golang.org/grpc"
-	"wesionary.team/dipeshdulal/console-chat/chatpb"
 )
 
 var channelName = flag.String("channel", "default", "Channel name for chatting")
 var senderName = flag.String("sender", "default", "Senders name")
 var tcpServer = flag.String("server", ":9100", "Tcp server")
-var clock h.Vector
+var id int
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 
@@ -82,6 +83,8 @@ func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message s
 
 }
 
+var clock h.Vector
+
 func main() {
 
 	flag.Parse()
@@ -119,5 +122,5 @@ func UpdateClock(recievedClock h.Vector) {
 }
 
 func IncrementClock() {
-	clock.clock[id]++
+	clock.Clock[id]++
 }

@@ -8,8 +8,9 @@ import (
 	"net"
 	"sync"
 
+	chatpb "handin3/chatpb"
+
 	"google.golang.org/grpc"
-	"wesionary.team/dipeshdulal/console-chat/chatpb"
 )
 
 var clock h.Vector
