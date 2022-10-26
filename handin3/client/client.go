@@ -22,3 +22,12 @@ func main() {
 	defer conn.Close()
 
 }
+
+func UpdateClock(recievedClock h.Vector) {
+	clock = h.AdjustToOtherClock(clock, recievedClock)
+	IncrementClock()
+}
+
+func IncrementClock() {
+	clock.clock[id]++
+}
