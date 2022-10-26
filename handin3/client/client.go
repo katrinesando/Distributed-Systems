@@ -45,19 +45,24 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 			}
 
 			mes := fmt.Sprintf("%v", in.Message)
-			if mes == "4040" {
-				fmt.Printf("--- %v Left the chat ---\n", in.Sender)
-			} else if mes == "1111" {
-				fmt.Printf("--- %v Joined the Chat ---\n", in.Sender)
-				id = in.Id
-			} else if *senderName != in.Sender {
-				fmt.Printf("(%v --ID: %v) : %v \n", in.Sender, in.Id, in.Message)
-			}
 			recClock := h.Vector{
 				Clock: in.Channel.Clock,
 			}
 
-			UpdateClock(recClock)
+			if mes == "4040" {
+				UpdateClock(recClock)
+				log.Printf("--- %v Left the chat --- at %v\n", in.Sender, in.Channel.Clock)
+			} else if mes == "1111" {
+				if id == 0 {
+					id = in.Id
+				}
+				UpdateClock(recClock)
+				log.Printf("--- %v Joined the Chat --- at %v\n", in.Sender, in.Channel.Clock)
+			} else if *senderName != in.Sender {
+				UpdateClock(recClock)
+				log.Printf("(%v) : %v at %v \n", in.Sender, in.Message, in.Channel.Clock)
+			}
+
 		}
 	}()
 	<-waitc
