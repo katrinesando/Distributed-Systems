@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 
 	chatpb "handin3/chatpb"
 
@@ -19,6 +20,7 @@ var channelName = flag.String("channel", "default", "Channel name for chatting")
 var senderName = flag.String("sender", "default", "Senders name")
 var tcpServer = flag.String("server", ":9100", "Tcp server")
 var id int
+var lock sync.Mutex
 
 func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 
@@ -110,6 +112,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		go sendMessage(ctx, client, scanner.Text())
+
 	}
 
 }
