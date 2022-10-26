@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	h "handin3"
 	"log"
 	"net"
 	t "time"
@@ -16,9 +17,7 @@ type Server struct {
 	pb.UnimplementedGetCurrentTimeServer
 }
 
-type Vector struct {
-	clock []int
-}
+var clock h.Vector
 
 func (s *Server) GetTime(ctx context.Context, in *pb.GetTimeRequest) (*pb.GetTimeReply, error) {
 	fmt.Printf("Received GetTime request\n")
