@@ -52,15 +52,18 @@ func joinChannel(ctx context.Context, client chatpb.ChatServiceClient) {
 			if mes == "4040" {
 				UpdateClock(recClock)
 				log.Printf("Participant %v left Chitty-Chat at Lamport time %v\n", in.Sender, in.Channel.Clock)
+				fmt.Printf("Participant %v left Chitty-Chat at Lamport time %v\n", in.Sender, in.Channel.Clock)
 			} else if mes == "1111" {
 				if id == 0 {
 					id = in.Id
 				}
 				UpdateClock(recClock)
 				log.Printf("Participant %v joined Chitty-Chat at Lamport time %v\n", in.Sender, in.Channel.Clock)
+				fmt.Printf("Participant %v joined Chitty-Chat at Lamport time %v\n", in.Sender, in.Channel.Clock)
 			} else if *senderName != in.Sender {
 				UpdateClock(recClock)
 				log.Printf("(%v) : %v at Lamport time %v \n", in.Sender, in.Message, in.Channel.Clock)
+				fmt.Printf("(%v) : %v at Lamport time %v \n", in.Sender, in.Message, in.Channel.Clock)
 			}
 
 		}
