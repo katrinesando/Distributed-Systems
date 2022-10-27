@@ -98,6 +98,13 @@ func sendMessage(ctx context.Context, client chatpb.ChatServiceClient, message s
 var clock h.Vector
 
 func main() {
+	LOG_FILE := "./txtLog"
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
 
 	clock.Clock = make([]int32, 1, 1)
 

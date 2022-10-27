@@ -26,7 +26,7 @@ type server struct {
 func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_JoinChannelServer) error {
 	msgChannel := make(chan *chatpb.Message)
 	s.channel[ch.Name] = append(s.channel[ch.Name], msgChannel)
-	log.Printf("--------- %v joined Chat ----------\n", ch.SendersName, ch.Clock)
+	log.Printf("SERVER: Participant %v joined Chitty-Chat at Lamport time %v\n", ch.SendersName, ch.Clock)
 	id++
 	broadcastMsg := chatpb.Message{
 		Channel: &chatpb.Channel{
@@ -48,8 +48,7 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 	for {
 		select {
 		case <-msgStream.Context().Done():
-
-			log.Printf("--------- %v Left Chat-------", ch.SendersName, ch.Clock)
+			log.Printf("SERVER: Participant %v left Chitty-Chat at Lamport time %v\n", ch.SendersName, ch.Clock)
 			for i, element := range s.channel[ch.Name] {
 				if element == msgChannel {
 					s.channel[ch.Name] = append(s.channel[ch.Name][:i], s.channel[ch.Name][i+1:]...)
@@ -76,7 +75,7 @@ func (s *server) JoinChannel(ch *chatpb.Channel, msgStream chatpb.ChatService_Jo
 
 			return nil
 		case msg := <-msgChannel:
-			log.Printf("Sent mes: %v", msg)
+			log.Printf("SERVER: Sent %v from: %v at Lamport time %v", msg.Message, msg.Sender, msg.Channel.Clock)
 			recClock := h.Vector{
 				Clock: msg.Channel.Clock,
 			}
@@ -136,7 +135,6 @@ func main() {
 	}
 	defer logFile.Close()
 	log.SetOutput(logFile)
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
 
 	id = 0
 	clock.Clock = make([]int32, 1, 1)
