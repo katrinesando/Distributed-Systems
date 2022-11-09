@@ -1,9 +1,8 @@
-module github.com/katrinesando/Distributed-Systems
+module github.com/katrinesando/Distributed-Systems/tree/Handin4_DME
 
 go 1.19
 
 require (
-	github.com/NaddiNadja/peer-to-peer v0.0.0-20221109134617-5970a1469caf
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 )

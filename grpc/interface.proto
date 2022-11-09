@@ -1,18 +1,19 @@
 syntax = "proto3";
 
-package ping;
-option go_package = "https://github.com/katrinesando/Distributed-Systemsping";
+package dme;
+option go_package = "https://github.com/katrinesando/Distributed-Systems/tree/Handin4_DME;dme";
 
 
-service Ping {
-    rpc ping (Request) returns (Reply) {}
+service AccesCritical {
+    rpc attemptAcces (Request) returns (Reply) {}
 }
 
 message Request {
     int32 id = 1;
+    int32 lamport = 2;
 }
 
 message Reply {
-    int32 amount = 1;
+    bool answer = 1;
 }
 

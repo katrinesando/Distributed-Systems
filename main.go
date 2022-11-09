@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	ping "github.com/NaddiNadja/peer-to-peer/grpc"
+	ping "github.com/katrinesando/Distributed-Systems/tree/Handin4_DME/grpc"
 	"google.golang.org/grpc"
 )
 
