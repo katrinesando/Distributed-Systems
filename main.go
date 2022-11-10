@@ -33,6 +33,7 @@ func main() {
 		lamport: 0,
 		clients: make(map[int32]dme.AccesCriticalClient),
 		ctx:     ctx,
+		state:   RELEASED,
 	}
 
 	// Create listener tcp on port ownPort
@@ -86,7 +87,6 @@ type peer struct {
 	clients map[int32]dme.AccesCriticalClient
 	ctx     context.Context
 	state   State
-	//needs some sort of queue - maybe put it on clients
 }
 
 type State int32
@@ -151,6 +151,7 @@ func (p *peer) requestToAll() {
 		if numValidReplies == len(p.clients) {
 			p.state = HELD
 			p.criticalSection()
+			break
 		}
 		numValidReplies = 0
 		time.Sleep(100)
