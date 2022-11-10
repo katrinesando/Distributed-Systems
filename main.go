@@ -92,13 +92,37 @@ const (
 	HELD
 )
 
-func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
+func (p *peer) ReplyAccessAttempt(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
-	fmt.Printf("user %v has lamport time %v", otherId, otherLamport)
+	if p.state != RELEASED {
+		if p.state == HELD {
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		} else if p.lamport < otherLamport {
+			p.lamport = otherLamport
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		} else if p.lamport == otherLamport && p.id > otherId {
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		}
 
-	rep := &dme.Reply{Answer: true}
-	return rep, nil
+	}
+	p.lamport++
+	return &dme.Reply{
+		Answer:  true,
+		Lamport: p.lamport,
+	}, nil
 }
 
 func (p *peer) requestToAll() {
@@ -107,7 +131,7 @@ func (p *peer) requestToAll() {
 	log.Printf("%v is requesting access to critial section", p.id)
 	request := &dme.Request{Id: p.id, Lamport: p.lamport} //needs to send lamport time stamp to all to others
 	for id, client := range p.clients {
-		reply, err := client.AttemptAcces(p.ctx, request)
+		reply, err := client.ReplyAccessAttempt(p.ctx, request)
 		if err != nil {
 			fmt.Println("something went wrong")
 		}
@@ -134,9 +158,10 @@ func isFlagPassed(port int32) bool {
 //function to see who has priority
 
 func CriticalSection(p peer) {
-	log.Println("Peer: ", p.id, "has entered the Critical Section at Lamport", p.lamport)
+	log.Printf("Peer: %v has entered the Critical Section", p.id)
 	time.Sleep(5)
+	log.Printf("Peer: %v has left the Critical Section", p.id)
 	p.lamport++
-	log.Println("Peer: ", p.id, "has left the Critical Section at Lamport", p.lamport)
+
 	p.state = RELEASED
 }

@@ -5,7 +5,7 @@ option go_package = "https://github.com/katrinesando/Distributed-Systems/tree/Ha
 
 
 service AccesCritical {
-    rpc attemptAcces (Request) returns (Reply) {}
+    rpc replyAccessAttempt (Request) returns (Reply) {}
 }
 
 message Request {
@@ -15,5 +15,6 @@ message Request {
 
 message Reply {
     bool answer = 1;
+    int32 lamport = 2;
 }
 
