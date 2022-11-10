@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	dme "github.com/katrinesando/Distributed-Systems/tree/Handin4_DME/grpc"
 	"google.golang.org/grpc"
@@ -84,4 +85,10 @@ const (
 func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
+}
+
+func CriticalSection(p peer) {
+	log.Printf("Peer: ", p.id, "has entered the Critical Section")
+	time.Sleep(5)
+	log.Printf("Peer: ", p.id, "has left the Critical Section")
 }
