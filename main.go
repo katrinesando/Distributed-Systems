@@ -15,7 +15,6 @@ import (
 )
 
 var id = flag.Int("id", 1, "id name")
-var port = flag.Int("port", 5000, "port name")
 
 func main() {
 	flag.Parse()
