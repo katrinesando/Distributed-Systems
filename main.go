@@ -88,7 +88,9 @@ func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, 
 }
 
 func CriticalSection(p peer) {
-	log.Printf("Peer: ", p.id, "has entered the Critical Section")
+	log.Printf("Peer: ", p.id, "has entered the Critical Section at Lamport", p.lamport)
 	time.Sleep(5)
-	log.Printf("Peer: ", p.id, "has left the Critical Section")
+	p.lamport++
+	log.Printf("Peer: ", p.id, "has left the Critical Section at Lamport", p.lamport)
+	p.state = RELEASED
 }
