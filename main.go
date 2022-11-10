@@ -164,7 +164,6 @@ func isFlagPassed(port int32) bool {
 		}
 		if int32(value) == port {
 			found = true
-
 		}
 	})
 	return found
@@ -179,4 +178,7 @@ func CriticalSection(p peer) {
 	log.Printf("Peer: %v has entered the Critical Section", p.id)
 	time.Sleep(5)
 	log.Printf("Peer: %v has left the Critical Section", p.id)
+	p.lamport++
+
+	p.state = RELEASED
 }
