@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -13,18 +14,25 @@ import (
 	"google.golang.org/grpc"
 )
 
+var id = flag.String("id", "default", "id name")
+var port = flag.Int("port", 5000, "port name")
+
 func main() {
-	arg1, _ := strconv.ParseInt(os.Args[1], 10, 32)
-	ownPort := int32(arg1) + 5000
+	flag.Parse()
+	ownPort := int32(*port)
+	if isFlagPassed(ownPort) {
+		fmt.Printf("Port %v is already taken, please use another port", ownPort)
+		//new port here
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	p := &peer{
-		id:            ownPort,
-		amountOfPings: make(map[int32]int32),
-		clients:       make(map[int32]dme.AccesCriticalClient),
-		ctx:           ctx,
+		id:      ownPort,
+		lamport: 0,
+		clients: make(map[int32]dme.AccesCriticalClient),
+		ctx:     ctx,
 	}
 
 	// Create listener tcp on port ownPort
@@ -42,7 +50,7 @@ func main() {
 	}()
 
 	for i := 0; i < 3; i++ {
-		port := int32(5000) + int32(i)
+		port := ownPort
 
 		if port == ownPort {
 			continue
@@ -71,6 +79,8 @@ type peer struct {
 	lamport int32
 	clients map[int32]dme.AccesCriticalClient
 	ctx     context.Context
+	state   State
+	//needs some sort of queue - maybe put it on clients
 }
 
 type State int32
@@ -84,4 +94,40 @@ const (
 func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
+	fmt.Printf("user %v has lamport time %v", otherId, otherLamport)
+
+	rep := &dme.Reply{Answer: true}
+	return rep, nil
 }
+
+func (p *peer) requestToAll() {
+	p.state = WANTED
+	p.lamport++
+	log.Printf("%v is requesting access to critial section", p.id)
+	request := &dme.Request{Id: p.id, Lamport: p.lamport} //needs to send lamport time stamp to all to others
+	for id, client := range p.clients {
+		reply, err := client.AttemptAcces(p.ctx, request)
+		if err != nil {
+			fmt.Println("something went wrong")
+		}
+		fmt.Printf("Got reply from id %v: %v\n", id, reply.Answer)
+	}
+}
+
+func isFlagPassed(port int32) bool {
+	found := false
+
+	flag.Visit(func(f *flag.Flag) {
+		value, err := strconv.Atoi(f.Name)
+		if err != nil {
+			fmt.Println("Error during String to Int")
+			return
+		}
+		if int32(value) == port {
+			found = true
+		}
+	})
+	return found
+}
+
+//function to see who has priority
