@@ -57,7 +57,7 @@ func main() {
 		}
 
 		var conn *grpc.ClientConn
-		fmt.Printf("Trying to dial: %v\n", port)
+		log.Printf("Trying to dial: %v\n", port)
 		conn, err := grpc.Dial(fmt.Sprintf(":%v", port), grpc.WithInsecure(), grpc.WithBlock())
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
@@ -141,12 +141,16 @@ func (p *peer) requestToAll() {
 		for id, client := range p.clients {
 			reply, err := client.ReplyAccessAttempt(p.ctx, request)
 			if err != nil {
-				fmt.Println("something went wrong")
+				log.Println("something went wrong")
 			}
 			if reply.Answer {
 				numValidReplies++
 			}
-			fmt.Printf("Got reply from id %v: %v\n", id, reply.Answer)
+			log.Printf("Got reply from id %v: %v\n", id, reply.Answer)
+		}
+		if numValidReplies == len(p.clients) {
+			p.state = HELD
+			p.criticalSection()
 		}
 		numValidReplies = 0
 		time.Sleep(100)
@@ -159,7 +163,7 @@ func isFlagPassed(port int32) bool {
 	flag.Visit(func(f *flag.Flag) {
 		value, err := strconv.Atoi(f.Name)
 		if err != nil {
-			fmt.Println("Error during String to Int")
+			log.Println("Error during String to Int")
 			return
 		}
 		if int32(value) == port {
@@ -174,7 +178,7 @@ func (p *peer) internalWork() {
 	time.Sleep(5)
 }
 
-func CriticalSection(p peer) {
+func (p *peer) criticalSection() {
 	log.Printf("Peer: %v has entered the Critical Section", p.id)
 	time.Sleep(5)
 	log.Printf("Peer: %v has left the Critical Section", p.id)
