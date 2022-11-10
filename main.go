@@ -31,7 +31,6 @@ func main() {
 	ownPort := 5000 + int32(*id)
 	if isFlagPassed(int32(*id)) {
 		fmt.Printf("id %v is already taken, please use another id", *id)
-		//new port here
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
