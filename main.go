@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
-	"os"
 	"strconv"
 	"time"
 
@@ -68,9 +67,15 @@ func main() {
 		p.clients[port] = c
 	}
 
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-
+	rand.Seed(time.Now().UnixNano())
+	for {
+		flip := rand.Float32()
+		if flip > 0.7 {
+			p.requestToAll()
+		} else {
+			p.lamport++
+			go p.internalWork()
+		}
 	}
 }
 
@@ -129,13 +134,22 @@ func (p *peer) requestToAll() {
 	p.state = WANTED
 	p.lamport++
 	log.Printf("%v is requesting access to critial section", p.id)
-	request := &dme.Request{Id: p.id, Lamport: p.lamport} //needs to send lamport time stamp to all to others
-	for id, client := range p.clients {
-		reply, err := client.ReplyAccessAttempt(p.ctx, request)
-		if err != nil {
-			fmt.Println("something went wrong")
+	request := &dme.Request{Id: p.id, Lamport: p.lamport}
+	numValidReplies := 0
+	for numValidReplies < len(p.clients) {
+
+		for id, client := range p.clients {
+			reply, err := client.ReplyAccessAttempt(p.ctx, request)
+			if err != nil {
+				fmt.Println("something went wrong")
+			}
+			if reply.Answer {
+				numValidReplies++
+			}
+			fmt.Printf("Got reply from id %v: %v\n", id, reply.Answer)
 		}
-		fmt.Printf("Got reply from id %v: %v\n", id, reply.Answer)
+		numValidReplies = 0
+		time.Sleep(100)
 	}
 }
 
@@ -156,7 +170,10 @@ func isFlagPassed(port int32) bool {
 	return found
 }
 
-//function to see who has priority
+func (p *peer) internalWork() {
+	log.Printf("%v is performing internal work", p.id)
+	time.Sleep(5)
+}
 
 func CriticalSection(p peer) {
 	log.Printf("Peer: %v has entered the Critical Section", p.id)
