@@ -14,14 +14,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-var id = flag.String("id", "default", "id name")
+var id = flag.Int("id", 1, "id name")
 var port = flag.Int("port", 5000, "port name")
 
 func main() {
 	flag.Parse()
-	ownPort := int32(*port)
-	if isFlagPassed(ownPort) {
-		fmt.Printf("Port %v is already taken, please use another port", ownPort)
+	ownPort := 5000 + int32(*id)
+	if isFlagPassed(int32(*id)) {
+		fmt.Printf("id %v is already taken, please use another id", *id)
 		//new port here
 	}
 
@@ -51,7 +51,7 @@ func main() {
 	}()
 
 	for i := 0; i < 3; i++ {
-		port := ownPort
+		port := int32(5000) + int32(i)
 
 		if port == ownPort {
 			continue
