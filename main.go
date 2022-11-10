@@ -134,9 +134,9 @@ func isFlagPassed(port int32) bool {
 //function to see who has priority
 
 func CriticalSection(p peer) {
-	log.Printf("Peer: ", p.id, "has entered the Critical Section at Lamport", p.lamport)
+	log.Println("Peer: ", p.id, "has entered the Critical Section at Lamport", p.lamport)
 	time.Sleep(5)
 	p.lamport++
-	log.Printf("Peer: ", p.id, "has left the Critical Section at Lamport", p.lamport)
+	log.Println("Peer: ", p.id, "has left the Critical Section at Lamport", p.lamport)
 	p.state = RELEASED
 }
