@@ -68,6 +68,7 @@ func main() {
 		p.clients[port] = c
 	}
 
+	//Psuedo randomly decides to either do interal work or request access to the critical section
 	rand.Seed(time.Now().UnixNano())
 	for {
 		flip := rand.Float32()
@@ -97,6 +98,8 @@ const (
 	HELD
 )
 
+// Function handling requests from other peers
+// The function is an implementation of the Ricart & Agrawala algorithm
 func (p *peer) ReplyAccessAttempt(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
@@ -178,11 +181,13 @@ func isFlagPassed(port int32) bool {
 	return found
 }
 
+// Dummy function representing internal operations
 func (p *peer) internalWork() {
 	log.Printf("Peer: %v is performing internal work at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
 }
 
+// Dummy function representing the critical section of the system
 func (p *peer) criticalSection() {
 	log.Printf("Peer: %v has entered the Critical Section at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
