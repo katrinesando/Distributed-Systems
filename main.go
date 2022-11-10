@@ -92,7 +92,7 @@ const (
 	HELD
 )
 
-func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
+func (p *peer) ReplyAccessAttempt(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
 	if p.state != RELEASED {
@@ -131,7 +131,7 @@ func (p *peer) requestToAll() {
 	log.Printf("%v is requesting access to critial section", p.id)
 	request := &dme.Request{Id: p.id, Lamport: p.lamport} //needs to send lamport time stamp to all to others
 	for id, client := range p.clients {
-		reply, err := client.AttemptAcces(p.ctx, request)
+		reply, err := client.ReplyAccessAttempt(p.ctx, request)
 		if err != nil {
 			fmt.Println("something went wrong")
 		}
