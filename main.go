@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"time"
 
@@ -15,10 +16,18 @@ import (
 )
 
 var id = flag.Int("id", 1, "id name")
-var port = flag.Int("port", 5000, "port name")
 
 func main() {
 	flag.Parse()
+
+	LOG_FILE := "./txtLog"
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
 	ownPort := 5000 + int32(*id)
 	if isFlagPassed(int32(*id)) {
 		fmt.Printf("id %v is already taken, please use another id", *id)
@@ -33,6 +42,7 @@ func main() {
 		lamport: 0,
 		clients: make(map[int32]dme.AccesCriticalClient),
 		ctx:     ctx,
+		state:   RELEASED,
 	}
 
 	// Create listener tcp on port ownPort
@@ -86,7 +96,6 @@ type peer struct {
 	clients map[int32]dme.AccesCriticalClient
 	ctx     context.Context
 	state   State
-	//needs some sort of queue - maybe put it on clients
 }
 
 type State int32
@@ -133,7 +142,7 @@ func (p *peer) ReplyAccessAttempt(ctx context.Context, req *dme.Request) (*dme.R
 func (p *peer) requestToAll() {
 	p.state = WANTED
 	p.lamport++
-	log.Printf("%v is requesting access to critial section", p.id)
+	log.Printf("Peer: %v is requesting access to critial section", p.id)
 	request := &dme.Request{Id: p.id, Lamport: p.lamport}
 	numValidReplies := 0
 	for numValidReplies < len(p.clients) {
@@ -144,6 +153,10 @@ func (p *peer) requestToAll() {
 				log.Println("something went wrong")
 			}
 			if reply.Answer {
+				if reply.Lamport > p.lamport {
+					p.lamport = reply.Lamport
+				}
+				p.lamport++
 				numValidReplies++
 			}
 			log.Printf("Got reply from id %v: %v\n", id, reply.Answer)
@@ -151,6 +164,7 @@ func (p *peer) requestToAll() {
 		if numValidReplies == len(p.clients) {
 			p.state = HELD
 			p.criticalSection()
+			break
 		}
 		numValidReplies = 0
 		time.Sleep(100)
@@ -174,15 +188,15 @@ func isFlagPassed(port int32) bool {
 }
 
 func (p *peer) internalWork() {
-	log.Printf("%v is performing internal work", p.id)
+	log.Printf("Peer: %v is performing internal work at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
 }
 
 func (p *peer) criticalSection() {
-	log.Printf("Peer: %v has entered the Critical Section", p.id)
+	log.Printf("Peer: %v has entered the Critical Section at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
-	log.Printf("Peer: %v has left the Critical Section", p.id)
 	p.lamport++
+	log.Printf("Peer: %v has left the Critical Section at lamport-time: %v", p.id, p.lamport)
 
 	p.state = RELEASED
 }
