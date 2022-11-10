@@ -69,6 +69,7 @@ type peer struct {
 	dme.UnimplementedAccesCriticalServer
 	id      int32
 	lamport int32
+	state   State
 	clients map[int32]dme.AccesCriticalClient
 	ctx     context.Context
 }
@@ -84,4 +85,7 @@ const (
 func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
+	if p.state == RELEASED {
+		
+	}
 }
