@@ -21,10 +21,9 @@ func main() {
 	defer cancel()
 
 	p := &peer{
-		id:            ownPort,
-		amountOfPings: make(map[int32]int32),
-		clients:       make(map[int32]dme.AccesCriticalClient),
-		ctx:           ctx,
+		id:      ownPort,
+		clients: make(map[int32]dme.AccesCriticalClient),
+		ctx:     ctx,
 	}
 
 	// Create listener tcp on port ownPort
@@ -85,7 +84,32 @@ const (
 func (p *peer) AttemptAcces(ctx context.Context, req *dme.Request) (*dme.Reply, error) {
 	otherId := req.Id
 	otherLamport := req.Lamport
-	if p.state == RELEASED {
-		
+	if p.state != RELEASED {
+		if p.state == HELD {
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		} else if p.lamport < otherLamport {
+			p.lamport = otherLamport
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		} else if p.lamport == otherLamport && p.id > otherId {
+			p.lamport++
+			return &dme.Reply{
+				Answer:  false,
+				Lamport: p.lamport,
+			}, nil
+		}
+
 	}
+	p.lamport++
+	return &dme.Reply{
+		Answer:  true,
+		Lamport: p.lamport,
+	}, nil
 }
