@@ -144,6 +144,10 @@ func (p *peer) requestToAll() {
 				log.Println("something went wrong")
 			}
 			if reply.Answer {
+				if reply.Lamport > p.lamport {
+					p.lamport = reply.Lamport
+				}
+				p.lamport++
 				numValidReplies++
 			}
 			log.Printf("Got reply from id %v: %v\n", id, reply.Answer)
