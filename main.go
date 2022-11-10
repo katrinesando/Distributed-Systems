@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	dme "github.com/katrinesando/Distributed-Systems/tree/Handin4_DME/grpc"
 	"google.golang.org/grpc"
@@ -114,6 +115,7 @@ func (p *peer) requestToAll() {
 	}
 }
 
+<<<<<<< HEAD
 func isFlagPassed(port int32) bool {
 	found := false
 
@@ -125,9 +127,12 @@ func isFlagPassed(port int32) bool {
 		}
 		if int32(value) == port {
 			found = true
-		}
-	})
-	return found
-}
+	
 
 //function to see who has priority
+
+func CriticalSection(p peer) {
+	log.Printf("Peer: ", p.id, "has entered the Critical Section")
+	time.Sleep(5)
+	log.Printf("Peer: ", p.id, "has left the Critical Section")
+}
