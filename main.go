@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"time"
 
@@ -15,10 +16,18 @@ import (
 )
 
 var id = flag.Int("id", 1, "id name")
-var port = flag.Int("port", 5000, "port name")
 
 func main() {
 	flag.Parse()
+
+	LOG_FILE := "./txtLog"
+	logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
 	ownPort := 5000 + int32(*id)
 	if isFlagPassed(int32(*id)) {
 		fmt.Printf("id %v is already taken, please use another id", *id)
