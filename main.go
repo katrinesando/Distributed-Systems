@@ -133,7 +133,7 @@ func (p *peer) ReplyAccessAttempt(ctx context.Context, req *dme.Request) (*dme.R
 func (p *peer) requestToAll() {
 	p.state = WANTED
 	p.lamport++
-	log.Printf("%v is requesting access to critial section", p.id)
+	log.Printf("Peer: %v is requesting access to critial section", p.id)
 	request := &dme.Request{Id: p.id, Lamport: p.lamport}
 	numValidReplies := 0
 	for numValidReplies < len(p.clients) {
@@ -179,15 +179,15 @@ func isFlagPassed(port int32) bool {
 }
 
 func (p *peer) internalWork() {
-	log.Printf("%v is performing internal work", p.id)
+	log.Printf("Peer: %v is performing internal work at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
 }
 
 func (p *peer) criticalSection() {
-	log.Printf("Peer: %v has entered the Critical Section", p.id)
+	log.Printf("Peer: %v has entered the Critical Section at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
-	log.Printf("Peer: %v has left the Critical Section", p.id)
 	p.lamport++
+	log.Printf("Peer: %v has left the Critical Section at lamport-time: %v", p.id, p.lamport)
 
 	p.state = RELEASED
 }
