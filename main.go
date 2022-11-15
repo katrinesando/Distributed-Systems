@@ -67,6 +67,7 @@ func main() {
 
 		var conn *grpc.ClientConn
 		log.Printf("Trying to dial: %v\n", port)
+		fmt.Printf("Trying to dial: %v\n", port)
 		conn, err := grpc.Dial(fmt.Sprintf(":%v", port), grpc.WithInsecure(), grpc.WithBlock())
 		if err != nil {
 			log.Fatalf("Could not connect: %s", err)
@@ -145,6 +146,7 @@ func (p *peer) requestToAll() {
 	p.state = WANTED
 	p.lamport++
 	log.Printf("Peer: %v is requesting access to critial section", p.id)
+	fmt.Printf("Peer: %v is requesting access to critial section", p.id)
 	request := &dme.Request{Id: p.id, Lamport: p.lamport}
 	numValidReplies := 0
 	for numValidReplies < len(p.clients) {
@@ -173,6 +175,7 @@ func (p *peer) requestToAll() {
 	}
 }
 
+// Function to make sure that the port is not taken when user input userID
 func isFlagPassed(port int32) bool {
 	found := false
 
@@ -192,15 +195,18 @@ func isFlagPassed(port int32) bool {
 // Dummy function representing internal operations
 func (p *peer) internalWork() {
 	log.Printf("Peer: %v is performing internal work at lamport-time: %v", p.id, p.lamport)
+	fmt.Printf("Peer: %v is performing internal work at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
 }
 
 // Dummy function representing the critical section of the system
 func (p *peer) criticalSection() {
 	log.Printf("Peer: %v has entered the Critical Section at lamport-time: %v", p.id, p.lamport)
+	fmt.Printf("Peer: %v has entered the Critical Section at lamport-time: %v", p.id, p.lamport)
 	time.Sleep(5)
 	p.lamport++
 	log.Printf("Peer: %v has left the Critical Section at lamport-time: %v", p.id, p.lamport)
+	fmt.Printf("Peer: %v has left the Critical Section at lamport-time: %v", p.id, p.lamport)
 
 	p.state = RELEASED
 }
