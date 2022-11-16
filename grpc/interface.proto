@@ -1,0 +1,24 @@
+syntax ="proto3";
+
+import "google/protobuf/empty.proto";
+package replication;
+option go_package = "handin5.dk/uni;grpc";
+
+service Auction{
+    rpc sendBid (Bid) returns (Ack) {}
+    rpc getResults (google.protobuf.Empty) returns (Result) {}
+}
+
+
+message Bid{
+    int32 BidAmount = 1;
+}
+
+message Ack{
+    int32 outcome = 1;
+}
+
+message Result{
+    bool inProcess =1;
+    int32 highestBid =2;
+}
