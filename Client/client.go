@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"strings"
 
-	"grpc"
+	// "grpc"
 
 	"google.golang.org/grpc"
-	"handin5.dk/uni/grpc"
+	handin "handin5.dk/uni/grpc"
 )
 
 var id int32
@@ -31,9 +31,7 @@ func main() {
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithBlock(), grpc.WithInsecure())
-
-	client := grpc.NewAuctionClient()
-
+	var client handin.AuctionClient
 	for i := 0; i < 3; i++ {
 		port := int32(5000) + int32(i)
 
@@ -41,8 +39,8 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to connect: %v", err)
 		}
-
-		client.Connect(conn)
+		client = handin.NewAuctionClient(conn)
+		// client.Connect(conn)
 		defer conn.Close()
 	}
 	scanner := bufio.NewScanner(os.Stdin)
@@ -50,7 +48,7 @@ func main() {
 		test := scanner.Text()
 		if strings.Contains(test, "Bid") {
 			bid, _ := strconv.Atoi(scanner.Text())
-			go sendBid(ctx, client, bid)
+			go sendBid(ctx, client, int32(bid))
 		}
 		if strings.Contains(test, "Result") {
 			go getResult(ctx, client)
@@ -59,40 +57,40 @@ func main() {
 	}
 }
 
-func sendBid(ctx context.Context, client grpc.AuctionClient, bidAmount int32) {
-	stream, err := client.SendBid(ctx)
-	if err != nil {
-		log.Printf("Cannot send bid: error: %v", err)
-	}
-
-	msg := grpc.Bid{
+func sendBid(ctx context.Context, client handin.AuctionClient, bidAmount int32) {
+	msg := handin.Bid{
 		BidAmount: bidAmount,
 		Id:        id,
 	}
-	stream.Send(&msg)
-
-	ack, err := stream.CloseAndRecv()
-	if err != nil {
-		log.Print("Cannot send ack: %v", err)
-		log.Print(ack)
-	}
-
-}
-
-func getResult(ctx context.Context, client grpc.AuctionClient) {
-
-	stream, err := client.GetResults(ctx)
+	_, err := client.SendBid(ctx, &msg)
 	if err != nil {
 		log.Printf("Cannot send bid: error: %v", err)
 	}
 
-	stream.Send()
+	// stream.send(&msg)
 
-	result, err := stream.CloseAndRecv()
+	// ack, err := stream.CloseAndRecv()
+	// if err != nil {
+	// 	log.Print("Cannot send ack: %v", err)
+	// 	log.Print(ack)
+	// }
+
+}
+
+func getResult(ctx context.Context, client handin.AuctionClient) {
+
+	stream, err := client.GetResults(ctx, nil)
 	if err != nil {
-		log.Print("Cannot send ack: %v", err)
-		log.Print(result)
+		log.Printf("Cannot send bid: error: %v", err)
 	}
-	log.Printf(result)
+
+	// stream.Send()
+
+	// result, err := stream.CloseAndRecv()
+	// if err != nil {
+	// 	log.Print("Cannot send ack: %v", err)
+	// 	log.Print(result)
+	// }
+	log.Printf("result %v", stream.HighestBid)
 
 }

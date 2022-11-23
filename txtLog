@@ -1,0 +1,9 @@
+2022/11/19 15:56:52 Failed to listen: listen tcp: address localhost0xc000067bd0: missing port in address
+2022/11/19 15:59:33 Failed to listen: listen tcp: address localhost0xc000089bc0: missing port in address
+2022/11/19 15:59:52 Failed to listen: listen tcp: address localhost0xc000067bd0: missing port in address
+2022/11/19 16:01:32 Failed to listen: listen tcp: address 91000: invalid port
+2022/11/19 16:03:37 Failed to listen: listen tcp: address 91000: invalid port
+2022/11/19 16:03:59 Failed to listen: listen tcp: address 91000: invalid port
+2022/11/19 16:05:17 Failed to listen: listen tcp: address 91000: invalid port
+2022/11/19 16:06:12 Failed to listen: listen tcp: address 91000: invalid port
+2022/11/19 16:07:22 Failed to listen: listen tcp 127.0.0.1:5000: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted.
